@@ -114,8 +114,20 @@ def max(x: float, y: float) -> float:
 # - prod: take the product of lists
 
 
-def map(func: tp.Callable, values: tp.Iterable[float]) -> tp.Iterable[float]:
-    return (func(row) for row in values)
+def map(fn: tp.Callable[[float], float]) -> tp.Callable[[tp.Iterable[float]], tp.Iterable[float]]:
+    """
+    Higher-order map.
+
+    See https://en.wikipedia.org/wiki/Map_(higher-order_function)
+
+    Args:
+        fn: Function from one value to one value.
+
+    Returns:
+        A function that takes a list, applies `fn` to each element, and returns a
+         new list
+    """
+    return lambda values: (fn(row) for row in values)
 
 
 def zipWith(
@@ -140,7 +152,7 @@ def reduce(func: tp.Callable, values: tp.Iterable[float]) -> float:
 
 
 def negList(values: tp.Iterable[float]) -> tp.Iterable[float]:
-    return map(neg, values)
+    return map(neg)(values)
 
 
 def addLists(
