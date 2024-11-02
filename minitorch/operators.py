@@ -131,24 +131,26 @@ def map(fn: tp.Callable[[float], float]) -> tp.Callable[[tp.Iterable[float]], tp
 
 
 def zipWith(
-    func: tp.Callable, left_value: tp.Iterable[float], right_values: tp.Iterable[float]
-) -> tp.Iterable[float]:
-    return (
-        func(left_value, right_values)
+    fn: tp.Callable
+) -> tp.Callable:
+    return lambda left_value, right_values: (
+        fn(left_value, right_values)
         for left_value, right_values in zip(left_value, right_values)
     )
 
 
-def reduce(func: tp.Callable, values: tp.Iterable[float]) -> float:
-    prev_val = None
-    for val in values:
+def reduce(func: tp.Callable) -> tp.Callable:
+    def foo(values: tp.Iterable[float]) -> float:
+        prev_val = None
+        for val in values:
+            if prev_val is None:
+                prev_val = val
+            else:
+                prev_val = func(prev_val, val)
         if prev_val is None:
-            prev_val = val
-        else:
-            prev_val = func(prev_val, val)
-    if prev_val is None:
-        return 0
-    return prev_val
+            return 0
+        return prev_val
+    return foo
 
 
 def negList(values: tp.Iterable[float]) -> tp.Iterable[float]:
@@ -158,12 +160,12 @@ def negList(values: tp.Iterable[float]) -> tp.Iterable[float]:
 def addLists(
     left_values: tp.Iterable[float], right_values: tp.Iterable[float]
 ) -> tp.Iterable[float]:
-    return zipWith(add, left_values, right_values)
+    return zipWith(add)(left_values, right_values)
 
 
 def sum(values: tp.Iterable[float]) -> float:
-    return reduce(add, values)
+    return reduce(add)(values)
 
 
 def prod(values: tp.Iterable[float]) -> float:
-    return reduce(mul, values)
+    return reduce(mul)(values)
